@@ -1,6 +1,6 @@
 outs:
-- md5: cf2c111378145a349a5c01ed2323247a.dir
-  size: 10130721
+- md5: 1a78072bfd6db46027c51b2624330b0b.dir
+  size: 11672963
   nfiles: 2
   hash: md5
   path: gold_snapshot
