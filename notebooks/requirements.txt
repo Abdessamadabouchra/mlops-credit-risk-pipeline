@@ -1,0 +1,6 @@
+# Dependencies of the analysis notebooks (EDA)
+pandas>=2.1
+pyarrow>=14
+matplotlib>=3.9
+scikit-learn>=1.3
+jupyterlab>=4

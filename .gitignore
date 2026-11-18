@@ -13,3 +13,6 @@ k8s/build/
 # python
 __pycache__/
 *.pyc
+
+# Jupyter
+.ipynb_checkpoints/

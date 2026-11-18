@@ -101,6 +101,32 @@ Il est lancé par `start.ps1`, **pas par Airflow** : il joue le rôle du monde e
 
 `jobs/promote.py` donne l'alias `champion` au nouveau modèle sauf s'il est moins bon que le champion de plus de `PROMOTION_TOLERANCE`. Une tolérance plutôt qu'un « strictement meilleur » : les deux AUC sont mesurées sur des jeux de test différents (gold grandit), et un ancien modèle entraîné sur 10 fois moins de données ne doit pas rester champion à cause du bruit. La décision et sa raison sont notées sur la version (tag `promotion_decision`).
 
+## Analyse exploratoire (EDA)
+
+Le dossier `notebooks/` contient l'analyse des données d'entraînement (jeu **gold**). Les notebooks sont fournis
+**déjà exécutés** : résultats et graphiques sont visibles directement, sur GitHub ou dans Jupyter.
+
+| Notebook | Contenu |
+|---|---|
+| [`01_eda_donnees.ipynb`](notebooks/01_eda_donnees.ipynb) | Qualité des données (types, valeurs manquantes, doublons, bornes), variable cible et déséquilibre, distributions selon la cible, variables catégorielles, taux de défaut par tranche, corrélations, valeurs extrêmes, et choix de modélisation qui en découlent |
+| [`02_analyse_variables_et_baseline.ipynb`](notebooks/02_analyse_variables_et_baseline.ipynb) | Pouvoir prédictif de chaque variable (AUC univariée, information mutuelle), modèle de référence scikit-learn (régression logistique) comparé au champion SparkML, courbes ROC et précision-rappel, coefficients, calibrage, analyse des seuils de risque de l'API |
+
+**Principaux résultats**
+- Données propres (aucune valeur manquante ni doublon après la couche silver) ; cible déséquilibrée (**16 %** de défauts), d'où l'évaluation par **AUC** et **AUC-PR**.
+- Le défaut est expliqué par le **score de crédit**, le **ratio d'endettement** et les **retards de paiement**, avec des relations monotones (taux de défaut de 55 % dans le premier décile du score contre 2,5 % dans le dernier). L'âge, l'ancienneté, le taux d'intérêt et les variables catégorielles n'apportent pas d'information.
+- La régression logistique de référence atteint **AUC 0,935 / AUC-PR 0,781**, en accord avec le champion SparkML (0,932 / 0,780) : ce qui valide le pipeline. Ses probabilités sont bien calibrées.
+- Seuils de l'API : `low` (< 0,2) regroupe 77 % des demandes avec 4 % de défauts ; `high` (≥ 0,5) a 77 % de défauts et capte près de 60 % de tous les défauts.
+
+**Exécution**
+```powershell
+pip install -r notebooks/requirements.txt
+jupyter lab notebooks/
+```
+Les notebooks lisent l'instantané gold versionné par DVC (`data/gold_snapshot/gold.parquet`, créé par la tâche
+`dvc_snapshot` du DAG). S'il est absent (projet cloné sans avoir lancé le pipeline), `notebooks/data_loader.py`
+génère un échantillon avec **le même générateur et les mêmes règles de nettoyage** que le pipeline : les notebooks
+restent exécutables sans l'infrastructure.
+
 ## API
 
 ```powershell
@@ -144,6 +170,7 @@ airflow/dags/credit_risk_pipeline.py
 api/main.py                  API FastAPI (modèle MLflow en Compose, modèle intégré à l'image en K8s)
 ui/app.py                    interface Streamlit
 k8s/                         déploiement Kubernetes (manifestes, Dockerfile.serving, deploy/undeploy/port-forward)
+notebooks/                   analyse exploratoire (EDA) et modèle de référence, avec data_loader.py
 scripts/                     vérification des images avant téléchargement (images.txt)
 data/gold_snapshot.dvc       version DVC du jeu gold (données dans MinIO, bucket dvc)
 rapport/main.pdf             rapport du projet
