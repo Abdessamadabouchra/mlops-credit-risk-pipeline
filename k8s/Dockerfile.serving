@@ -1,0 +1,11 @@
+# Serving image for Kubernetes: the project image (API + UI code, Spark, XGBoost) + the champion model baked in.
+# Built by k8s/deploy.ps1 with the context k8s/build (which contains model/ exported from MLflow).
+FROM mlops-spark:1.0
+
+ARG MODEL_VERSION=unknown
+COPY model /opt/model
+ENV MODEL_PATH=/opt/model \
+    MODEL_VERSION=${MODEL_VERSION}
+
+LABEL org.opencontainers.image.title="credit-risk-serving" \
+      credit-risk.model-version="${MODEL_VERSION}"

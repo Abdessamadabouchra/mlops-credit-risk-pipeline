@@ -1,0 +1,6 @@
+apache/kafka:4.0.1
+alpine/minio:RELEASE.2025-10-15T17-29-55Z
+postgres:16
+apache/airflow:2.10.5
+apache/spark:3.5.1-scala2.12-java17-python3-ubuntu
+kafbat/kafka-ui:v1.0.0

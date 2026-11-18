@@ -1,0 +1,10 @@
+.claude
+.env
+airflow
+docker
+scripts
+k8s
+data
+*.ps1
+*.cmd
+**/__pycache__

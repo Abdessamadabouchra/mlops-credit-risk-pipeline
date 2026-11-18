@@ -1,0 +1,15 @@
+# secrets (copy .env.example to .env; start.ps1 does it automatically)
+.env
+
+# local tooling, not part of the project
+.claude/
+
+# model exported for the Kubernetes image (rebuilt by k8s/deploy.ps1)
+k8s/build/
+
+# local logs written by the scripts
+*.log
+
+# python
+__pycache__/
+*.pyc
