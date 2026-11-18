@@ -1,0 +1,14 @@
+# Files executed inside Linux containers must keep Unix line endings, even on a Windows clone
+*.sh          text eol=lf
+Dockerfile*   text eol=lf
+*.yml         text eol=lf
+*.yaml        text eol=lf
+
+# Windows scripts
+*.ps1         text eol=crlf
+*.cmd         text eol=crlf
+
+# binaries
+*.pdf         binary
+*.mp4         binary
+*.png         binary
